@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import static game.Battlefield.TileType.HIT;
 
-public class Battlefield implements BattlefieldCommon {
+public class Battlefield {
 	static int height;
 	private TileType[][] battlefield;
 
@@ -22,7 +22,6 @@ public class Battlefield implements BattlefieldCommon {
 		myFor(new CallBack() {
 			public void call(int x, int y) {
 				battlefield[x][y] = TileType.WATER;
-				System.out.println(x);
 			}
 		});
 	}
@@ -31,13 +30,12 @@ public class Battlefield implements BattlefieldCommon {
 		String position;
 		String direction;
 		Scanner mySc = new Scanner(System.in);
-		for (int boatSize = 1; boatSize < 6; boatSize++) {
-			System.out.println("Pozice levého rohu " + boatSize + " políčkové lodi");
+		for (int boatSize = 1; boatSize <= height; boatSize++) {
+			System.out.println("Pozice pravého horního rohu " + boatSize + " políčkové lodi");
 			position = mySc.nextLine();
 
 			int cooX = transferToNums(position)[0];
 			int cooY = transferToNums(position)[1];
-
 			if (fitsInMap(cooX, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
 				if (fitsInMap(cooY, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
 					System.out.println("Loď povede z pole " + position + " vertikálně, nebo horizontálně?(V/H)");
@@ -53,7 +51,6 @@ public class Battlefield implements BattlefieldCommon {
 					buildShipH(cooX, cooY, boatSize);
 				}
 			} else {
-
 				if (fitsInMap(cooY, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
 					System.out.println("Loď povede vertikálně");
 					//automaticky vybran vhodny smer, je jen jeden mozny
@@ -76,13 +73,13 @@ public class Battlefield implements BattlefieldCommon {
 	}
 
 	public boolean notCollidingWithOtherShips(int cooX, int cooY, int boatLength) {
-		for (int y = cooY; y < cooY + boatLength; y++) {
-			if (this.battlefield[y][cooX] == TileType.SHIP) {
+		for (int y = cooY; y < cooY + boatLength && y < height; y++) {
+			if (this.battlefield[y][cooX] != TileType.WATER) {
 				return false;
 			}
 		}
-		for (int x = cooX; x < cooX + boatLength; x++) {
-			if (this.battlefield[cooY][x] == TileType.SHIP) {
+		for (int x = cooX; x < cooX + boatLength && x < height; x++) {
+			if (this.battlefield[cooY][x] != TileType.WATER) {
 				return false;
 			}
 		}
@@ -113,16 +110,37 @@ public class Battlefield implements BattlefieldCommon {
 				switch (battlefield[x][y]) {
 					case WATER:
 						System.out.print("0");
+						break;
 					case SHIP:
 						System.out.print("1");
+						break;
 					case MISS:
 						System.out.print("X");
+						break;
 					case HIT:
 						System.out.print("*");
+						break;
 				}
 			}
 			System.out.println("");
 		}
+	}
+
+	private int[] transferToNums(String tile) {
+
+		int[] outputArr = new int[2];
+		int myCastedString;
+		outputArr[0] = tile.charAt(0) - 97;
+		if(tile.length() > 2){
+			myCastedString = Integer.parseInt(tile.substring(1,3));
+		} else {
+			myCastedString = height - Integer.parseInt(tile.substring(1,2));
+		}
+		outputArr[1] = myCastedString;
+		System.out.println(outputArr[0]);
+		System.out.println(outputArr[1]);
+		return outputArr;
+
 	}
 
 

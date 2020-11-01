@@ -2,7 +2,7 @@ package game;
 
 import java.util.Scanner;
 
-public class MyGame implements BattlefieldCommon {
+public class MyGame{
     public static void main(String[] Args) {
         Scanner mySc = new Scanner(System.in);
         int size = 0;
@@ -18,8 +18,6 @@ public class MyGame implements BattlefieldCommon {
 
         pole1.placeShips();
         pole2.placeShips();
-
-        pole1.transferToNums("c4");
 
         while (notWon) {
             System.out.println("Střelba na pole!:");
