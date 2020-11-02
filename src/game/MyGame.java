@@ -21,16 +21,25 @@ public class MyGame{
 
         while (notWon) {
             System.out.println("Střelba na pole!:");
+            mySc.nextLine(); // just to clean the buffer
             tileUnderFire = mySc.nextLine();
             //hráč jedna střílí na hráče dva
             notWon = pole2.evaluateAttack(tileUnderFire);
             pole2.drawBattlefield();
+            if(!notWon){
+                System.out.println("HRÁČ 1 VYHRÁL!");
+                break;
+            }
 
             System.out.println("Střelba na pole!:");
             tileUnderFire = mySc.nextLine();
             //hráč jedna střílí na hráče dva
             notWon = pole1.evaluateAttack(tileUnderFire);
             pole1.drawBattlefield();
+            if(!notWon){
+                System.out.println("HRÁČ 2 VYHRÁL!");
+                break;
+            }
         }
     }
 

@@ -7,7 +7,7 @@ import static game.Battlefield.TileType.HIT;
 public class Battlefield {
 	static int height;
 	private TileType[][] battlefield;
-
+	boolean ifWon = false;
 	enum TileType {
 		WATER,
 		SHIP,
@@ -99,9 +99,32 @@ public class Battlefield {
 	}
 
 	public boolean evaluateAttack(String tileCode) {
-		boolean ifWon = false;
+		int attackCooX = transferToNums(tileCode)[0];
+		int attackCooY = transferToNums(tileCode)[1];
+		switch (battlefield[attackCooY][attackCooX]) {
+			case WATER:
+				battlefield[attackCooY][attackCooX] = TileType.MISS;
+				break;
+			case SHIP:
+				battlefield[attackCooY][attackCooX] = TileType.HIT;
+				break;
+			case MISS:
+				System.out.println("nemůžete sem střílet, toto pole už bylo dřív MISS!");
+				break;
+			case HIT:
+				System.out.println("nemůžete sem střílet, toto pole už bylo dřív HIT!");
+				break;
+		}
 
-		return ifWon;
+
+		for (int x = 0; x < height; x++) {
+			for (int y = 0; y < height; y++) {
+				if(battlefield[x][y] == TileType.SHIP){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public void drawBattlefield() {
@@ -109,16 +132,16 @@ public class Battlefield {
 			for (int y = 0; y < height; y++) {
 				switch (battlefield[x][y]) {
 					case WATER:
-						System.out.print("0");
+						System.out.print(" 0 ");
 						break;
 					case SHIP:
-						System.out.print("1");
+						System.out.print(" 1 ");
 						break;
 					case MISS:
-						System.out.print("X");
+						System.out.print(" X ");
 						break;
 					case HIT:
-						System.out.print("*");
+						System.out.print(" * ");
 						break;
 				}
 			}
@@ -127,7 +150,9 @@ public class Battlefield {
 	}
 
 	private int[] transferToNums(String tile) {
-
+		if(tile.length() == 0){
+			return null;
+		}
 		int[] outputArr = new int[2];
 		int myCastedString;
 		outputArr[0] = tile.charAt(0) - 97;
