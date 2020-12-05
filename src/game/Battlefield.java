@@ -2,26 +2,18 @@ package game;
 
 import java.util.Scanner;
 
-import static game.Battlefield.TileType.HIT;
-
 public class Battlefield {
 	static int height;
-	private TileType[][] battlefield;
+	private Field[][] battlefield;
 	boolean ifWon = false;
-	enum TileType {
-		WATER,
-		SHIP,
-		MISS,
-		HIT
-	}
 
 	public Battlefield(int dimensions) {
 		height = dimensions;
-		battlefield = new TileType[height][height];
+		battlefield = new Field[height][height];
 
 		myFor(new CallBack() {
 			public void call(int x, int y) {
-				battlefield[x][y] = TileType.WATER;
+				battlefield[x][y] = new Field("WATER");
 			}
 		});
 	}
@@ -31,7 +23,7 @@ public class Battlefield {
 		String direction;
 		Scanner mySc = new Scanner(System.in);
 		for (int boatSize = 1; boatSize <= height; boatSize++) {
-			System.out.println("Pozice pravého horního rohu " + boatSize + " políčkové lodi");
+			System.out.println("Pozice levého horního rohu " + boatSize + " políčkové lodi");
 			position = mySc.nextLine();
 
 			int cooX = transferToNums(position)[0];
@@ -74,12 +66,12 @@ public class Battlefield {
 
 	public boolean notCollidingWithOtherShips(int cooX, int cooY, int boatLength) {
 		for (int y = cooY; y < cooY + boatLength && y < height; y++) {
-			if (this.battlefield[y][cooX] != TileType.WATER) {
+			if (this.battlefield[y][cooX].getType() != "WATER") {
 				return false;
 			}
 		}
 		for (int x = cooX; x < cooX + boatLength && x < height; x++) {
-			if (this.battlefield[cooY][x] != TileType.WATER) {
+			if (this.battlefield[cooY][x].getType() != "WATER") {
 				return false;
 			}
 		}
@@ -88,30 +80,30 @@ public class Battlefield {
 
 	public void buildShipH(int cooX, int cooY, int boatLength) {
 		for (int x = cooX; x < cooX + boatLength; x++) {
-			this.battlefield[cooY][x] = TileType.SHIP;
+			this.battlefield[cooY][x] = new Field("SHIP", boatLength);
 		}
 	}
 
 	public void buildShipV(int cooX, int cooY, int boatLength) {
 		for (int y = cooY; y < cooY + boatLength; y++) {
-			this.battlefield[y][cooX] = TileType.SHIP;
+			this.battlefield[y][cooX] = new Field("SHIP", boatLength);
 		}
 	}
 
 	public boolean evaluateAttack(String tileCode) {
 		int attackCooX = transferToNums(tileCode)[0];
 		int attackCooY = transferToNums(tileCode)[1];
-		switch (battlefield[attackCooY][attackCooX]) {
-			case WATER:
-				battlefield[attackCooY][attackCooX] = TileType.MISS;
+		switch (battlefield[attackCooY][attackCooX].getType()) {
+			case "WATER":
+				battlefield[attackCooY][attackCooX] = new Field("MISS");
 				break;
-			case SHIP:
-				battlefield[attackCooY][attackCooX] = TileType.HIT;
+			case "SHIP":
+				battlefield[attackCooY][attackCooX] = new Field("HIT");
 				break;
-			case MISS:
+			case "MISS":
 				System.out.println("nemůžete sem střílet, toto pole už bylo dřív MISS!");
 				break;
-			case HIT:
+			case "HIT":
 				System.out.println("nemůžete sem střílet, toto pole už bylo dřív HIT!");
 				break;
 		}
@@ -119,7 +111,7 @@ public class Battlefield {
 
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < height; y++) {
-				if(battlefield[x][y] == TileType.SHIP){
+				if(battlefield[x][y].getType() == "SHIP"){
 					return true;
 				}
 			}
@@ -130,18 +122,21 @@ public class Battlefield {
 	public void drawBattlefield() {
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < height; y++) {
-				switch (battlefield[x][y]) {
-					case WATER:
+				switch (battlefield[x][y].getType()) {
+					case "WATER":
 						System.out.print(" 0 ");
 						break;
-					case SHIP:
-						System.out.print(" 1 ");
+					case "SHIP":
+						System.out.print(" " + battlefield[x][y].getDimensions() + " ");
 						break;
-					case MISS:
+					case "MISS":
 						System.out.print(" X ");
 						break;
-					case HIT:
+					case "HIT":
 						System.out.print(" * ");
+						break;
+					default:
+						System.out.print(" 0 ");
 						break;
 				}
 			}
@@ -162,8 +157,6 @@ public class Battlefield {
 			myCastedString = height - Integer.parseInt(tile.substring(1,2));
 		}
 		outputArr[1] = myCastedString;
-		System.out.println(outputArr[0]);
-		System.out.println(outputArr[1]);
 		return outputArr;
 
 	}

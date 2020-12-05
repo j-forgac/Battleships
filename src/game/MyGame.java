@@ -19,6 +19,7 @@ public class MyGame{
         pole1.placeShips();
         pole2.placeShips();
 
+
         while (notWon) {
             System.out.println("Střelba na pole!:");
             mySc.nextLine(); // just to clean the buffer
