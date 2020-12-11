@@ -1,5 +1,6 @@
 package game;
 
+import java.io.FileReader;
 import java.util.Scanner;
 
 public class Battlefield {
@@ -13,7 +14,7 @@ public class Battlefield {
 
 		myFor(new CallBack() {
 			public void call(int x, int y) {
-				battlefield[x][y] = new Field("WATER");
+				battlefield[x][y] = Field.createWater();
 			}
 		});
 	}
@@ -80,13 +81,13 @@ public class Battlefield {
 
 	public void buildShipH(int cooX, int cooY, int boatLength) {
 		for (int x = cooX; x < cooX + boatLength; x++) {
-			this.battlefield[cooY][x] = new Field("SHIP", boatLength);
+			this.battlefield[cooY][x] = Field.createShip(boatLength);
 		}
 	}
 
 	public void buildShipV(int cooX, int cooY, int boatLength) {
 		for (int y = cooY; y < cooY + boatLength; y++) {
-			this.battlefield[y][cooX] = new Field("SHIP", boatLength);
+			this.battlefield[y][cooX] = Field.createShip(boatLength);
 		}
 	}
 
@@ -95,10 +96,10 @@ public class Battlefield {
 		int attackCooY = transferToNums(tileCode)[1];
 		switch (battlefield[attackCooY][attackCooX].getType()) {
 			case "WATER":
-				battlefield[attackCooY][attackCooX] = new Field("MISS");
+				battlefield[attackCooY][attackCooX] = Field.createMiss();
 				break;
 			case "SHIP":
-				battlefield[attackCooY][attackCooX] = new Field("HIT");
+				battlefield[attackCooY][attackCooX] = Field.createHit();
 				break;
 			case "MISS":
 				System.out.println("nemůžete sem střílet, toto pole už bylo dřív MISS!");
