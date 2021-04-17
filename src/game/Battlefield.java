@@ -1,6 +1,7 @@
 package game;
 
 import java.io.FileReader;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class Battlefield {
@@ -29,50 +30,50 @@ public class Battlefield {
 
 			int cooX = transferToNums(position)[0];
 			int cooY = transferToNums(position)[1];
-			if (fitsInMap(cooX, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
-				if (fitsInMap(cooY, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
+			boolean canBeBuiltY = canBeBuilt(true, cooX, cooY, boatSize);
+			boolean canBeBuiltX = canBeBuilt(false, cooX, cooY, boatSize);
+			System.out.println("Y : " + canBeBuiltY);
+			System.out.println("X : " + canBeBuiltX);
+			if (canBeBuiltX || canBeBuiltY) {
+				if (canBeBuiltX && canBeBuiltY){
 					System.out.println("Loď povede z pole " + position + " vertikálně, nebo horizontálně?(V/H)");
 					direction = mySc.nextLine();
-					if (direction.equals("V")) {
+					if (direction.toUpperCase(Locale.ROOT).equals("V")) {
 						buildShipV(cooX, cooY, boatSize);
 					} else {
 						buildShipH(cooX, cooY, boatSize);
 					}
+				} else if (canBeBuiltX){
+					buildShipV(cooX, cooY, boatSize);
 				} else {
-					System.out.println("Loď povede horizontálně");
-					//automaticky vybran vhodny smer, je jen jeden mozny
 					buildShipH(cooX, cooY, boatSize);
 				}
 			} else {
-				if (fitsInMap(cooY, boatSize) && notCollidingWithOtherShips(cooX, cooY, boatSize)) {
-					System.out.println("Loď povede vertikálně");
-					//automaticky vybran vhodny smer, je jen jeden mozny
-					buildShipV(cooX, cooY, boatSize);
-				} else {
-					System.out.println("Zvolte jiné pole. Loď se nevejde!");
-				}
+				System.out.println("Zvolte jiné pole. Loď se nevejde!");
 			}
 			drawBattlefield();
 		}
 	}
 
-	public boolean fitsInMap(int coos, int boatLength) {
-		int boundaries = this.battlefield.length;
-		if (coos + boatLength <= boundaries) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean notCollidingWithOtherShips(int cooX, int cooY, int boatLength) {
-		for (int y = cooY; y < cooY + boatLength && y < height; y++) {
-			if (this.battlefield[y][cooX].getType() != "WATER") {
+	public boolean canBeBuilt(boolean axis, int cooX, int cooY, int boatLength) { //* true = X false = Y
+		if (axis) {
+			try { //* check if colliding with other ships
+				for (int x = cooX; x < cooX + boatLength; x++) {
+					if (!this.battlefield[cooY][x].getType().equals("WATER")) {
+						return false;
+					}
+				}
+			} catch (Exception e) { //* doesn't fit in map
 				return false;
 			}
-		}
-		for (int x = cooX; x < cooX + boatLength && x < height; x++) {
-			if (this.battlefield[cooY][x].getType() != "WATER") {
+		} else {
+			try {
+				for (int y = cooY; y < cooY + boatLength; y++) {
+					if (!this.battlefield[y][cooX].getType().equals("WATER")) {
+						return false;
+					}
+				}
+			} catch (Exception e) {
 				return false;
 			}
 		}
@@ -112,7 +113,7 @@ public class Battlefield {
 
 		for (int x = 0; x < height; x++) {
 			for (int y = 0; y < height; y++) {
-				if(battlefield[x][y].getType() == "SHIP"){
+				if (battlefield[x][y].getType() == "SHIP") {
 					return true;
 				}
 			}
@@ -146,16 +147,16 @@ public class Battlefield {
 	}
 
 	private int[] transferToNums(String tile) {
-		if(tile.length() == 0){
+		if (tile.length() == 0) {
 			return null;
 		}
 		int[] outputArr = new int[2];
 		int myCastedString;
 		outputArr[0] = tile.charAt(0) - 97;
-		if(tile.length() > 2){
-			myCastedString = Integer.parseInt(tile.substring(1,3));
+		if (tile.length() > 2) {
+			myCastedString = Integer.parseInt(tile.substring(1, 3));
 		} else {
-			myCastedString = height - Integer.parseInt(tile.substring(1,2));
+			myCastedString = height - Integer.parseInt(tile.substring(1, 2));
 		}
 		outputArr[1] = myCastedString;
 		return outputArr;
